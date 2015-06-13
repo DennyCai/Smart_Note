@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/note_padding_top"
+    android:paddingBottom="@dimen/note_padding_top"
+    android:paddingLeft="@dimen/note_padding_left"
+    android:paddingRight="@dimen/note_padding_right"
+    android:clickable="true"
+    android:background="@drawable/note_bg"
+    >
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="?attr/colorPrimary"
+        android:layout_marginBottom="@dimen/note_time_margin"/>
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_below="@id/time"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@android:color/background_dark"
+        android:gravity="start"/>
+
+</RelativeLayout>
