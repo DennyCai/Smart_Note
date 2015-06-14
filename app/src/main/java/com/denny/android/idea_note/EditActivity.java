@@ -1,5 +1,6 @@
 package com.denny.android.idea_note;
 
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -24,6 +25,7 @@ import java.util.Date;
 public class EditActivity extends AppCompatActivity {
 
     public final static String NOTE_ID = "note_id";
+    public static final String HAS_CHANGED = "note_changed";
 
     Toolbar toolbar;
     FloatingActionButton fab;
@@ -90,7 +92,7 @@ public class EditActivity extends AppCompatActivity {
      * @param save 是否保存
      */
     private void finishEdit(boolean save) {
-        setResult(0);
+        setResult(0 ,new Intent().putExtra(HAS_CHANGED,save));
         if(save && saveNote()){
             this.supportFinishAfterTransition();
         }
@@ -102,7 +104,7 @@ public class EditActivity extends AppCompatActivity {
      */
     private boolean saveNote() {
         String content = editview.getText().toString();
-        if(null == content || "".equals(content)){
+        if(content ==null || "".equals(content)){
             Snackbar.make(findViewById(R.id.rootview),"请输入内容",Snackbar.LENGTH_SHORT)
                     .show();
             return false;

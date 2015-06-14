@@ -16,6 +16,8 @@
         <!-- color of the menu overflow icon (three vertical dots) -->
         <item name="android:textColorSecondary">@color/my_secondary_text</item>
 
+        <!--ActionMode为覆盖模式，叠加在ActionBar上面-->
+        <item name="windowActionModeOverlay">true</item>
 
         <!--<item name="android:windowBackground">@color/window_background</item>-->
     </style>

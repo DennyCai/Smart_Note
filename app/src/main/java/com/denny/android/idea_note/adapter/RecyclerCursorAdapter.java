@@ -47,7 +47,6 @@ public abstract class RecyclerCursorAdapter<VH extends RecyclerView.ViewHolder> 
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
-        Log.e("onBind",position+"");
         if (!mDataValid) {
             throw new IllegalStateException("this should only be called when the cursor is valid");
         }
@@ -67,7 +66,6 @@ public abstract class RecyclerCursorAdapter<VH extends RecyclerView.ViewHolder> 
 
     @Override
     public long getItemId(int position) {
-        Log.e(RecyclerCursorAdapter.class.getSimpleName(),"position:"+position);
         if(mDataValid && mCursor!=null && mCursor.moveToPosition(position) ){
             return mCursor.getLong(mRowIdColumn);
         }else
@@ -133,6 +131,7 @@ public abstract class RecyclerCursorAdapter<VH extends RecyclerView.ViewHolder> 
         public void onInvalidated() {
             super.onInvalidated();
             mDataValid = false;
+            notifyDataSetChanged();
             Log.e("Adapter","onInvalidated");
 
         }

@@ -83,11 +83,11 @@ public class MainActivity extends AppCompatActivity {
 
     //获取指针
     private Cursor getCursor() {
-        Cursor s = new SQLHelper(this).getReadableDatabase().query(false,
+        Log.e(MainActivity.class.getSimpleName(),"flush cursor!");
+        return new SQLHelper(this).getReadableDatabase().query(false,
                 NotePreview.NoteEntry.TABLE,
                 new String[]{NotePreview.NoteEntry._ID,NotePreview.NoteEntry.CONTENT, NotePreview.NoteEntry.CREATED_TIME},
                 "",new String[]{},"","","","");
-        return  s;
     }
 
     private void initToolBar() {
@@ -108,7 +108,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.e(MainActivity.class.getSimpleName(), "Result");
-        adapter.setCursor(getCursor());
+        if(data!=null){//如过返回Intent并HAS_CHANGED为TRUE，则刷新Cursor
+            boolean change = data.getBooleanExtra(EditActivity.HAS_CHANGED,false);
+            if (change)
+                adapter.changeCursor(getCursor());
+        }
+
     }
 
 
