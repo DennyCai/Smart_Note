@@ -20,6 +20,14 @@
         <item name="windowActionModeOverlay">true</item>
 
         <!--<item name="android:windowBackground">@color/window_background</item>-->
+
+        <!--PopupMenu-->
+        <item name="textAppearanceLargePopupMenu">@style/MyTextAppearance.Widget.PopupMenu</item>
+    </style>
+
+    <!--PopupMenu Text Style-->
+    <style name="MyTextAppearance.Widget.PopupMenu" parent="TextAppearance.AppCompat.Light.Widget.PopupMenu.Large">
+        <item name="android:textColor">@color/primary_material_dark</item>
     </style>
 
     <!--
@@ -47,4 +55,5 @@
         <item name="android:paddingBottom">24dp</item>
         <item name="android:orientation">vertical</item>
     </style>
+
 </resources>

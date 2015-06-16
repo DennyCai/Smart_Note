@@ -24,7 +24,7 @@ public class NoteDaoImpl implements NoteDao{
     }
 
     @Override
-    public NotePreview findNoteById(int id) {
+    public NotePreview findNoteById(long id) {
         NotePreview note= null;
         SQLiteDatabase db = mHelper.getReadableDatabase();
         Cursor c =db.query(false,

@@ -44,8 +44,14 @@
             android:layout_height="match_parent"
             android:gravity="start"
             android:textColor="@android:color/black"
-            android:layout_marginTop="@dimen/card_mt"/>
+            android:layout_marginTop="@dimen/card_mt"
+            android:layout_marginBottom="@dimen/card_mt"/>
 
+        <TextView android:id="@+id/update_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|left"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
     </android.support.v7.widget.CardView>
 
     <android.support.design.widget.FloatingActionButton
@@ -53,6 +59,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
-        android:src="@drawable/ic_done_white_24dp" />
+        android:src="@drawable/abc_ic_menu_moreoverflow_mtrl_alpha" />
 
 </android.support.design.widget.CoordinatorLayout>

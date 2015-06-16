@@ -1,23 +1,28 @@
 package com.denny.android.idea_note;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.PopupWindowCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.internal.widget.AppCompatPopupWindow;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.denny.android.idea_note.dao.NoteDao;
 import com.denny.android.idea_note.dao.impl.NoteDaoImpl;
-import com.denny.android.idea_note.db.SQLHelper;
 import com.denny.android.idea_note.domain.NotePreview;
+import com.denny.android.idea_note.utils.DateUtil;
 
-import java.util.Date;
 
 /**
  * Created by hasee on 2015/6/12.
@@ -30,11 +35,13 @@ public class EditActivity extends AppCompatActivity {
     Toolbar toolbar;
     FloatingActionButton fab;
     EditText editview;
+    TextView mUpdateTime;
 
     private NoteDao mDao;
 
-    private boolean new_note ;
-    private int mNote_id;
+    private boolean mCreate ;
+    private long mNote_id;
+    private PopupMenu mMorePopup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,24 +55,45 @@ public class EditActivity extends AppCompatActivity {
     }
 
     private void setupStat() {
-        mNote_id = getIntent().getIntExtra(NOTE_ID,-1);
-        new_note = mNote_id ==-1;
+        mNote_id = getIntent().getLongExtra(NOTE_ID, -1);
+        mCreate = mNote_id ==-1;
     }
 
     private void initViews() {
         fab= (FloatingActionButton) findViewById(R.id.done);
         editview = (EditText) findViewById(R.id.note_edit);
+        mUpdateTime = (TextView) findViewById(R.id.update_time);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                finishEdit(true);
+                showMoreMenu();
             }
         });
-        if (!new_note){
-            editview.setText(mDao.findNoteById(mNote_id).getContent());
+        if (!mCreate){
+            NotePreview notePreview = mDao.findNoteById(mNote_id);
+            editview.setText(notePreview.getContent());
             editview.setSelection(editview.getText().length());
+            String date = DateUtil.format(notePreview.getUpdateTime());
+            mUpdateTime.setText(getString(R.string.update_time,date));
         }
+    }
+
+
+
+
+    private void showMoreMenu() {
+        if (mMorePopup==null) {
+            mMorePopup = new PopupMenu(this, fab, Gravity.NO_GRAVITY);
+            mMorePopup.inflate(R.menu.more);
+            mMorePopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+
+                    return false;
+                }
+            });
+        }
+        mMorePopup.show();
     }
 
 
@@ -82,20 +110,33 @@ public class EditActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == android.R.id.home){
-            supportFinishAfterTransition();
+            onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * 完成编辑并退出
-     * @param save 是否保存
-     */
-    private void finishEdit(boolean save) {
-        setResult(0 ,new Intent().putExtra(HAS_CHANGED,save));
-        if(save && saveNote()){
-            this.supportFinishAfterTransition();
+    @Override
+    public void onBackPressed() {
+        dispathNote();
+        super.onBackPressed();
+    }
+
+    private void dispathNote() {
+        String content = editview.getText().toString();
+        //如果为新建模式且内容未空就不保存
+        if(mCreate && content.equals(""))
+            return;
+
+        NotePreview note = new NotePreview();
+        if(mCreate){//新建
+            note.setContent(content);
+            mDao.save(note);
+        }else{//更新操作
+            note.setId(mNote_id);
+            note.setContent(content);
+            mDao.update(note);
         }
+        setResult(0 ,new Intent().putExtra(HAS_CHANGED,true));
     }
 
     /**
@@ -111,7 +152,7 @@ public class EditActivity extends AppCompatActivity {
         }
         NotePreview note = new NotePreview();
         note.setContent(content);
-        if(new_note) {
+        if(mCreate) {
             mDao.save(note);
         }else{
             note.setId(mNote_id);

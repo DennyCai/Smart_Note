@@ -4,6 +4,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <string name="menu_delete">删除</string>
+
      <string name="long_text">Android 5.0 Lollipop was one of the most significant Android releases ever,
         in no small part due to the introduction of material design,
         a new design language that refreshed the entire Android experience
@@ -12,4 +14,10 @@
 
     <color name="my_title_text_color">#ffffff</color>
     <color name="my_wbg">#aaaaaa</color>
+
+
+    <string name="add_photo">添加图片</string>
+    <string name="add_record">添加语音</string>
+
+    <string name="update_time">上次更新时间：%s</string>
 </resources>

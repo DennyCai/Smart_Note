@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public class NotePreview {
 
-    private int id;
+    private long id;
     private String content;
     private long createTime;
     private long updateTime;
@@ -25,11 +25,11 @@ public class NotePreview {
         this.updateTime = updateTime;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

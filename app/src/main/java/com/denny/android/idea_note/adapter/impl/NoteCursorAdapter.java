@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -31,7 +34,7 @@ public class NoteCursorAdapter extends RecyclerCursorAdapter<NoteCursorAdapter.V
         super(context, cursor);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public TextView contenttext;
         public TextView time;
@@ -40,20 +43,28 @@ public class NoteCursorAdapter extends RecyclerCursorAdapter<NoteCursorAdapter.V
         public ViewHolder(View itemView) {
             super(itemView);
             root=itemView;
+            root.setOnClickListener(this);
+//            root.setOnLongClickListener(this);
             contenttext = (TextView) itemView.findViewById(R.id.content);
             time = (TextView) itemView.findViewById(R.id.time);
         }
+
+        @Override
+        public void onClick(View v) {
+            Log.e("Adapter","Item Id:"+getItemId());
+            Intent intent = new Intent(v.getContext(),EditActivity.class);
+            intent.putExtra(EditActivity.NOTE_ID, getItemId());
+            ((AppCompatActivity)v.getContext()).startActivityForResult(intent, 0);
+        }
+
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, Cursor cursor) {
-        int id = cursor.getInt(0);
         String content = cursor.getString(cursor.getColumnIndex(NotePreview.NoteEntry.CONTENT));
         long created_time = cursor.getLong(cursor.getColumnIndex(NotePreview.NoteEntry.CREATED_TIME));
-        holder.root.setOnClickListener(new NoteOnClickListener(id));
         holder.time.setText(DateUtil.format(created_time));
         holder.contenttext.setText(content);
-        Log.e("Cursor",content);
     }
 
     @Override
@@ -63,21 +74,5 @@ public class NoteCursorAdapter extends RecyclerCursorAdapter<NoteCursorAdapter.V
         return vh;
     }
 
-    public class NoteOnClickListener implements View.OnClickListener{
-
-        private int mId;
-
-        public NoteOnClickListener(int id){
-            mId=id;
-        }
-        @Override
-        public void onClick(View v) {
-            Log.e("OnClick Note", mId + "");
-            Intent intent =new Intent();
-            intent.putExtra(EditActivity.NOTE_ID,mId);
-            intent.setClass(v.getContext(), EditActivity.class);
-            ((AppCompatActivity)v.getContext()).startActivityForResult(intent,0);
-        }
-    }
 
 }
