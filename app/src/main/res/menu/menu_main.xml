@@ -1,6 +1,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+    <group android:checkableBehavior="all">
+        <item android:id="@+id/my_note" android:title="@string/my_note"
+        android:orderInCategory="100" app:showAsAction="never"
+            android:checked="true"
+            android:checkable="true"/>
+
+        <item android:id="@+id/cloud" android:title="@string/cloud"
+            android:orderInCategory="200" app:showAsAction="never"
+            android:checkable="true"/>
+
+        <item android:id="@+id/settings" android:title="@string/settings"
+            android:orderInCategory="300" app:showAsAction="never"
+            android:checkable="true"
+            />
+    </group>
 </menu>

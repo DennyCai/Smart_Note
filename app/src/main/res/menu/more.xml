@@ -7,4 +7,10 @@
     <item android:id="@+id/add_record"
         android:title="@string/add_record"
         />
+    <item android:id="@+id/add_alert"
+        android:title="@string/add_alert"
+        />
+    <item android:id="@+id/del_note"
+        android:title="@string/delete_note"
+        />
 </menu>

@@ -1,5 +1,7 @@
 package com.denny.android.idea_note.dao;
 
+import android.content.ContentValues;
+
 import com.denny.android.idea_note.domain.NotePreview;
 
 /**
@@ -7,6 +9,14 @@ import com.denny.android.idea_note.domain.NotePreview;
  */
 public interface NoteDao {
     NotePreview findNoteById(long id);
-    boolean save(NotePreview note);
+
+    long save(NotePreview note);
+
     boolean update(NotePreview note);
+
+    boolean update(NotePreview note,ContentValues values);
+
+    boolean delete(NotePreview note);
+
+    boolean deleteById(long id);
 }

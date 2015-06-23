@@ -40,7 +40,7 @@ public class NoteDaoImpl implements NoteDao{
     }
 
     @Override
-    public boolean save(NotePreview note) {
+    public long save(NotePreview note) {
         long id = -1;
         if (note!=null){
             SQLiteDatabase db = mHelper.getWritableDatabase();
@@ -49,23 +49,40 @@ public class NoteDaoImpl implements NoteDao{
             values.put(NotePreview.NoteEntry.CREATED_TIME,new Date().getTime());
             id = mHelper.getWritableDatabase().insert(NotePreview.NoteEntry.TABLE,"",values);
         }
-        return id!=-1;
+        return id;
     }
 
     @Override
-    public boolean update(NotePreview note) throws RuntimeException{
+    public boolean update(NotePreview note , ContentValues values) {
         long eff;
         if(note.getId()==-1){
             throw new RuntimeException("NotePreview 没有id!");
         }else{
             SQLiteDatabase db = mHelper.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(NotePreview.NoteEntry.CONTENT,note.getContent());
-            values.put(NotePreview.NoteEntry.UPDATED_TIME,new Date().getTime());
             eff = db.update(NotePreview.NoteEntry.TABLE,values,"_id = ?",new String[]{note.getId()+""});
             db.close();
             return eff!=0;
         }
+    }
 
+    @Override
+    public boolean update(NotePreview note) throws RuntimeException{
+        ContentValues values = new ContentValues();
+        values.put(NotePreview.NoteEntry.CONTENT,note.getContent());
+        values.put(NotePreview.NoteEntry.UPDATED_TIME,new Date().getTime());
+        return update(note,values);
+    }
+
+    @Override
+    public boolean delete(NotePreview note) {
+        ContentValues values = new ContentValues();
+        values.put(NotePreview.NoteEntry._DELETE,1);
+        return update(note,values);
+    }
+
+    @Override
+    public boolean deleteById(long id) {
+        NotePreview note = new NotePreview(id);
+        return delete(note);
     }
 }

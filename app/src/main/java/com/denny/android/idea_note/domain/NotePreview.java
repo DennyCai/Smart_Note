@@ -18,7 +18,11 @@ public class NotePreview {
         this(-1,"",0,0);
     }
 
-    public NotePreview(int id, String content, long createTime, long updateTime) {
+    public NotePreview(long id){
+        this(id,"",0,0);
+    }
+
+    public NotePreview(long id, String content, long createTime, long updateTime) {
         this.id = id;
         this.content = content;
         this.createTime = createTime;
@@ -63,6 +67,7 @@ public class NotePreview {
         public static final String CONTENT = "content";
         public static final String CREATED_TIME = "created_time";
         public static final String UPDATED_TIME = "updated_time";
+        public static final String _DELETE = "_delete";
         public static final String[] ALL = new String[]{_ID,CONTENT,CREATED_TIME,UPDATED_TIME};
     }
 }

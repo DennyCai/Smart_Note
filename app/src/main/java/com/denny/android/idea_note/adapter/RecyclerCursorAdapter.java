@@ -1,11 +1,21 @@
 package com.denny.android.idea_note.adapter;
 
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Intent;
 import android.database.Cursor;
+import android.database.CursorJoiner;
 import android.database.DataSetObserver;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Currency;
+import java.util.List;
 
 /**
  * Created by hasee on 2015/6/12.
@@ -21,6 +31,7 @@ public abstract class RecyclerCursorAdapter<VH extends RecyclerView.ViewHolder> 
     private boolean mDataValid;
 
     private int mRowIdColumn;
+
 
     public RecyclerCursorAdapter(Context context, Cursor cursor){
         mContext = context ;
@@ -87,28 +98,33 @@ public abstract class RecyclerCursorAdapter<VH extends RecyclerView.ViewHolder> 
         }
     }
 
+
+
+
     /**
      * Swap in a new Cursor, returning the old Cursor.  Unlike
      * {@link #changeCursor(Cursor)}, the returned old Cursor is <em>not</em>
      * closed.
      */
     public Cursor swapCursor(Cursor newCursor) {
-        if (newCursor == mCursor) {
+        if (newCursor == mCursor) {//指针相同不更换
             return null;
         }
         final Cursor oldCursor = mCursor;
-        if (oldCursor != null && mDataSetObserver != null) {
+        if (oldCursor != null && mDataSetObserver != null) {//注销旧指针的Data观察者
             oldCursor.unregisterDataSetObserver(mDataSetObserver);
         }
         mCursor = newCursor;
         if (mCursor != null) {
-            if (mDataSetObserver != null) {
+            if (mDataSetObserver != null) {//注册新的观察者
                 mCursor.registerDataSetObserver(mDataSetObserver);
             }
             mRowIdColumn = newCursor.getColumnIndexOrThrow("_id");
             mDataValid = true;
             notifyDataSetChanged();
+//            notifyItemRangeChanged(0,newCursor.getCount());
         } else {
+            //指针没有内容
             mRowIdColumn = -1;
             mDataValid = false;
             notifyDataSetChanged();
@@ -117,7 +133,22 @@ public abstract class RecyclerCursorAdapter<VH extends RecyclerView.ViewHolder> 
         return oldCursor;
     }
 
+    private int[] compareCursor(Cursor oldCursor,Cursor newCursor){
+        int desc = newCursor.getCount() - oldCursor.getCount();
+        List<Integer> list =new ArrayList<Integer>();
+
+        if (desc>0){
+            for (int i=0;i<desc;i++)
+                list.add(i);
+        }else{
+
+        }
+
+        return new int[]{};
+    }
+
     public class NotifyingDataSetObserver extends DataSetObserver{
+
 
         @Override
         public void onChanged() {
