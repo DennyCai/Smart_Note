@@ -36,6 +36,7 @@ public class SQLHelper extends SQLiteOpenHelper {
                 NotePreview.NoteEntry.CONTENT + TEXT + "," +
                 NotePreview.NoteEntry.CREATED_TIME + VARCHAR(20) + "," +
                 NotePreview.NoteEntry.UPDATED_TIME + VARCHAR(20) + "," +
+                NotePreview.NoteEntry.ALARM_TIME + VARCHAR(20) + "," +
                 NotePreview.NoteEntry._DELETE + BOOL + NOT_NULL + DEFAULT(0) +
                 ")");
     }

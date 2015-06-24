@@ -1,34 +1,34 @@
 package com.denny.android.idea_note;
 
-import android.app.TimePickerDialog;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.widget.PopupWindowCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.internal.widget.AppCompatPopupWindow;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.NumberPicker;
-import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import com.denny.android.idea_note.dao.NoteDao;
 import com.denny.android.idea_note.dao.impl.NoteDaoImpl;
 import com.denny.android.idea_note.domain.NotePreview;
+import com.denny.android.idea_note.recevier.NoteAlarmRecevier;
 import com.denny.android.idea_note.utils.DateUtil;
+import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.Calendar;
 
@@ -45,12 +45,17 @@ public class EditActivity extends AppCompatActivity {
     FloatingActionButton fab;
     EditText editview;
     TextView mUpdateTime;
+    TextView alarm;
 
     private NoteDao mDao;
 
     private boolean mCreate ;
     private long mNote_id;
     private PopupMenu mMorePopup;
+
+    private Calendar alarmTime;
+
+    private NotePreview mNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,18 +65,59 @@ public class EditActivity extends AppCompatActivity {
         mDao = new NoteDaoImpl(this);
         setupStat();
         setupToolBar();
+//        initMore();
         initViews();
+    }
+
+    private void initMore() {
+        mMorePopup = new PopupMenu(this, fab, Gravity.NO_GRAVITY);
+        mMorePopup.inflate(R.menu.more);
+        Menu menu = mMorePopup.getMenu();
+        if (mCreate){
+            menu.findItem(R.id.del_note).setVisible(false);
+        }
+        mMorePopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.del_note:
+                        deleteNote();
+                        break;
+                    case R.id.add_alert:
+                        showPickerDialog();
+                        break;
+                    case R.id.add_photo:
+                        addPhoto();
+                        break;
+                   /* case R.id.del_alert:
+                        deleteAlert();
+                        break;
+                    case R.id.upd_alert:
+                        updateAlert();
+                        break;*/
+                }
+                return false;
+            }
+        });
     }
 
     private void setupStat() {
         mNote_id = getIntent().getLongExtra(NOTE_ID, -1);
         mCreate = mNote_id ==-1;
+        if(!mCreate)
+            mNote = mDao.findNoteById(mNote_id);
     }
 
     private void initViews() {
         fab= (FloatingActionButton) findViewById(R.id.done);
         editview = (EditText) findViewById(R.id.note_edit);
         mUpdateTime = (TextView) findViewById(R.id.update_time);
+        alarm= (TextView) findViewById(R.id.alarm);
+
+        if(!mCreate && mNote.getAlarmTime()!=-1){
+            showAlarmText(DateUtil.format(mNote.getAlarmTime(),"MM/dd/HH:mm"));
+        }
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,46 +138,100 @@ public class EditActivity extends AppCompatActivity {
         }
     }
 
+    private void showAlarmText(String time) {
+
+        if(alarm.getCompoundDrawables()[0]==null){
+            Log.i("", "CreateDrawable");
+            alarm.setCompoundDrawables(getAlarmDrawable(),null,null,null);
+        }
+        alarm.setText(time);
+    }
+
+    private  void removeAlarmText(){
+        alarm.setCompoundDrawables(null,null,null,null);
+        alarm.setText("");
+        alarmTime=null;
+    }
 
 
-
+    //更多功能按钮
     private void showMoreMenu() {
-        if (mMorePopup==null) {
-            mMorePopup = new PopupMenu(this, fab, Gravity.NO_GRAVITY);
-            mMorePopup.inflate(R.menu.more);
-            Menu menu = mMorePopup.getMenu();
-            if (mCreate){
-                menu.findItem(R.id.del_note).setVisible(false);
-            }
-            mMorePopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    switch (item.getItemId()) {
-                        case R.id.del_note:
-                            deleteNote();
-                            break;
-                        case R.id.add_alert:
-                            showPickerDialog();
-                            break;
-                        case R.id.add_photo:
-                            addPhoto();
-                            break;
-                    }
-                    return false;
-                }
-            });
+        if(mMorePopup==null){
+            initMore();
         }
         mMorePopup.show();
+    }
+
+    private void updateAlert() {
+        showPickerDialog(alarmTime);
+    }
+
+    private void deleteAlert() {
+        removeAlarmText();
+
     }
 
     //启动相机
     private void addPhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent,0);
+        startActivityForResult(intent, 0);
     }
 
+    //显示TimePicker
     private void showPickerDialog() {
+        showPickerDialog(Calendar.getInstance());
+    }
 
+    private void showPickerDialog(Calendar c){
+//        Calendar c = Calendar.getInstance();
+        TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(RadialPickerLayout radialPickerLayout, int hourOfDay, int minutes) {
+                Log.e("TimePicker", "Hour:" + hourOfDay + ":" + minutes);
+                addAlert(hourOfDay,minutes);
+            }
+        }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show(getFragmentManager(), null);
+        //*/
+    }
+
+    //添加提醒
+    private void addAlert(int hour,int min){
+        Calendar c = Calendar.getInstance();
+        int nowHour = c.get(Calendar.HOUR_OF_DAY);
+        int nowMin = c.get(Calendar.MINUTE);
+
+
+        c.set(Calendar.HOUR_OF_DAY, hour);
+        c.set(Calendar.MINUTE, min);
+        if(hour<nowHour){
+            c.add(Calendar.DATE,1);
+        }else if(hour==nowHour){
+            if(min<=nowMin){
+                c.add(Calendar.DATE,1);
+            }
+        }
+        String time = c.get(Calendar.MONTH) + "/" + c.get(Calendar.DAY_OF_MONTH) + "/" + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE);
+        Log.e("Alert", "time:" + time);
+        alarmTime = c;
+
+        showAlarmText(DateUtil.format(c.getTimeInMillis(), "MM/dd/HH:mm"));
+
+    }
+
+    //生成图标
+    private Drawable getAlarmDrawable(){
+        Drawable left = getResources().getDrawable(android.R.drawable.ic_lock_idle_alarm);
+        // PorterDuff.Mode.SRC_ATOP 相交图像变色
+        left.setColorFilter(getResources().getColor(R.color.my_primary), PorterDuff.Mode.SRC_ATOP);
+
+        left.setBounds(0, 0, left.getIntrinsicWidth(), left.getIntrinsicHeight());
+        return left;
+    }
+
+    private void setAlert(long mil,long noteId){
+        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        PendingIntent pendingIntent =PendingIntent.getBroadcast(this,0,new Intent("action.alarm.note").setClass(this, NoteAlarmRecevier.class),0);
+        alarm.set(AlarmManager.RTC_WAKEUP,mil,pendingIntent);
     }
 
     private void deleteNote(){
@@ -181,16 +281,25 @@ public class EditActivity extends AppCompatActivity {
 
     private void dispathNote() {
         String content = editview.getText().toString();
+        long newId=-1;
         Intent intent;
         //如果为新建模式且内容未空就不保存
         if(mCreate && content.equals(""))
             return;
 
         NotePreview note = new NotePreview();
+
+        //是否设置闹钟
+        if(alarmTime!=null){
+            note.setAlarmTime(alarmTime.getTimeInMillis());
+        }else{
+            note.setAlarmTime(-1);
+        }
+
         if(mCreate){//新建
             note.setContent(content);
-            long id = mDao.save(note);
-            intent= makeIntent(MainActivity.ACTION_ADD,id);
+            newId = mDao.save(note);
+            intent= makeIntent(MainActivity.ACTION_ADD, newId);
         }else{//更新操作
             note.setId(mNote_id);
             note.setContent(content);
@@ -198,13 +307,19 @@ public class EditActivity extends AppCompatActivity {
             intent = makeIntent(MainActivity.ACTION_UPDATE,mNote_id);
         }
 
+
+        if(note.getAlarmTime()!=-1)
+            setAlert(note.getAlarmTime(),mCreate ? newId : note.getId() );
+
+
 //        Intent intent = makeIntent();
         setResult(0, intent);
     }
 
+    //更行Note
     private void updateNote(NotePreview note) {
         NotePreview old = mDao.findNoteById(note.getId());
-        if(old.getContent().equals(note.getContent()))
+        if(old.getContent().equals(note.getContent())&&old.getAlarmTime()==note.getAlarmTime())
             return;
         mDao.update(note);
     }

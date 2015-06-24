@@ -14,7 +14,8 @@ public class NoteFactory {
             notePreview=new NotePreview(c.getInt(c.getColumnIndex(NotePreview.NoteEntry._ID)),
                     c.getString(c.getColumnIndex(NotePreview.NoteEntry.CONTENT)),
                     c.getLong(c.getColumnIndex(NotePreview.NoteEntry.CREATED_TIME)),
-                    c.getLong(c.getColumnIndex(NotePreview.NoteEntry.UPDATED_TIME)));
+                    c.getLong(c.getColumnIndex(NotePreview.NoteEntry.UPDATED_TIME)),
+                    c.getLong(c.getColumnIndex(NotePreview.NoteEntry.ALARM_TIME)));
         }
         c.close();
         return notePreview;

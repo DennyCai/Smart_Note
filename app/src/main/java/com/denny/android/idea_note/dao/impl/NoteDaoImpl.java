@@ -47,6 +47,7 @@ public class NoteDaoImpl implements NoteDao{
             ContentValues values = new ContentValues();
             values.put(NotePreview.NoteEntry.CONTENT,note.getContent());
             values.put(NotePreview.NoteEntry.CREATED_TIME,new Date().getTime());
+            values.put(NotePreview.NoteEntry.ALARM_TIME,note.getAlarmTime());
             id = mHelper.getWritableDatabase().insert(NotePreview.NoteEntry.TABLE,"",values);
         }
         return id;
@@ -70,6 +71,7 @@ public class NoteDaoImpl implements NoteDao{
         ContentValues values = new ContentValues();
         values.put(NotePreview.NoteEntry.CONTENT,note.getContent());
         values.put(NotePreview.NoteEntry.UPDATED_TIME,new Date().getTime());
+        values.put(NotePreview.NoteEntry.ALARM_TIME,note.getAlarmTime());
         return update(note,values);
     }
 

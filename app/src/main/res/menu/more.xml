@@ -6,6 +6,7 @@
         />
     <item android:id="@+id/add_record"
         android:title="@string/add_record"
+        android:visible="false"
         />
     <item android:id="@+id/add_alert"
         android:title="@string/add_alert"

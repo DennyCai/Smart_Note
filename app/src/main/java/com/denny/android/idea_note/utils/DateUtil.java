@@ -10,8 +10,13 @@ import java.util.Date;
  */
 public class DateUtil {
     public static String format(Date date){
-        return new SimpleDateFormat("MM月 dd日 HH:mm:ss").format(date);
+        return format(date.getTime(),"MM月 dd日 HH:mm:ss");
     }
+
+    public static String format(long time,String format){
+        return new SimpleDateFormat(format).format(new Date(time));
+    }
+
     public static String format(long time) {
         return format(new Date(time));
     }

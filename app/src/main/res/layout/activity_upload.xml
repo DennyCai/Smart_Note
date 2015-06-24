@@ -10,8 +10,11 @@
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"/>
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
+    <include android:layout_below="@+id/toolbar"
+        layout="@layout/dialog_login"
+        android:id="@+id/loginView"
+        android:layout_margin="10dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar"/>
+        android:layout_width="match_parent"/>
 
 </RelativeLayout>

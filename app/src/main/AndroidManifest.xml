@@ -9,7 +9,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/icdoit"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/Base.Theme.HMKCodeApp" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -28,6 +28,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.denny.android.idea_note.MainActivity" />
         </activity>
+
+        <receiver
+            android:name=".recevier.NoteAlarmRecevier"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="action.alarm.note"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

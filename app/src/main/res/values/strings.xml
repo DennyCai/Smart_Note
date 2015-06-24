@@ -25,6 +25,8 @@
     <string name="add_photo">添加图片</string>
     <string name="add_record">添加语音</string>
     <string name="add_alert">添加提醒</string>
+    <string name="upd_alert">修改提醒</string>
+    <string name="del_alert">删除提醒</string>
     <string name="delete_note">删除笔记</string>
 
     <string name="update_time">上次更新时间：%s</string>

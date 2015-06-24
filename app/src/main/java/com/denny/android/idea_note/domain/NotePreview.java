@@ -13,20 +13,22 @@ public class NotePreview {
     private String content;
     private long createTime;
     private long updateTime;
+    private long alarmTime;
 
     public NotePreview(){
-        this(-1,"",0,0);
+        this(-1);
     }
 
     public NotePreview(long id){
-        this(id,"",0,0);
+        this(id,"", 0 , 0 , -1 );
     }
 
-    public NotePreview(long id, String content, long createTime, long updateTime) {
+    public NotePreview(long id, String content, long createTime, long updateTime,long alarmTime) {
         this.id = id;
         this.content = content;
         this.createTime = createTime;
         this.updateTime = updateTime;
+        this.alarmTime = alarmTime;
     }
 
     public long getId() {
@@ -61,6 +63,14 @@ public class NotePreview {
         this.updateTime = updateTime;
     }
 
+    public long getAlarmTime() {
+        return alarmTime;
+    }
+
+    public void setAlarmTime(long alarmTime) {
+        this.alarmTime = alarmTime;
+    }
+
     public static abstract class NoteEntry{
         public static final String TABLE = "notes";
         public static final String _ID = "_id";
@@ -68,6 +78,7 @@ public class NotePreview {
         public static final String CREATED_TIME = "created_time";
         public static final String UPDATED_TIME = "updated_time";
         public static final String _DELETE = "_delete";
-        public static final String[] ALL = new String[]{_ID,CONTENT,CREATED_TIME,UPDATED_TIME};
+        public static final String ALARM_TIME = "alarm_time";
+        public static final String[] ALL = new String[]{_ID,CONTENT,CREATED_TIME,UPDATED_TIME,ALARM_TIME,_DELETE};
     }
 }
