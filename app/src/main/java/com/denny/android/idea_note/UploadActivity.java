@@ -11,8 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 
 
+import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobSMS;
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.LogInListener;
 import cn.bmob.v3.listener.RequestSMSCodeListener;
 
 
@@ -29,6 +32,8 @@ public class UploadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
 
+        Bmob.initialize(this,"dffbde3237022699fab5d3d131d7da3f");
+
         bar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(bar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -40,7 +45,17 @@ public class UploadActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                BmobUser.signOrLoginByMobilePhone(UploadActivity.this, phone.getText().toString(), code.getText().toString(), new LogInListener<BmobUser>() {
+                    @Override
+                    public void done(BmobUser user, BmobException e) {
+                        if(e==null){
+                            Log.e("LoginSuccess",user.getMobilePhoneNumber()+"--");
+                            Log.e("User",BmobUser.getCurrentUser(UploadActivity.this)==null ? "null" : "not null");
+                        }else{
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
         });
 //        showLoginDialog();

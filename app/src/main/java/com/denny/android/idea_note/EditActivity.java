@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.internal.widget.DrawableUtils;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -27,10 +29,16 @@ import com.denny.android.idea_note.dao.impl.NoteDaoImpl;
 import com.denny.android.idea_note.domain.NotePreview;
 import com.denny.android.idea_note.recevier.NoteAlarmRecevier;
 import com.denny.android.idea_note.utils.DateUtil;
+import com.denny.android.idea_note.utils.DrawableUtil;
+import com.denny.android.idea_note.utils.FileUtil;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 
 /**
@@ -46,6 +54,7 @@ public class EditActivity extends AppCompatActivity {
     EditText editview;
     TextView mUpdateTime;
     TextView alarm;
+    TextView images;
 
     private NoteDao mDao;
 
@@ -56,6 +65,8 @@ public class EditActivity extends AppCompatActivity {
     private Calendar alarmTime;
 
     private NotePreview mNote;
+
+    private List<File> files;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +117,20 @@ public class EditActivity extends AppCompatActivity {
         mCreate = mNote_id ==-1;
         if(!mCreate)
             mNote = mDao.findNoteById(mNote_id);
+
+        files = new ArrayList<>();
+    }
+
+    private void setupToolBar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (mCreate)
+            toolbar.setTitle(R.string.add);
+        else
+            toolbar.setTitle(R.string.edit);
+        setSupportActionBar(toolbar);
+        ActionBar bar=getSupportActionBar();
+        bar.setHomeButtonEnabled(true);
+        bar.setDisplayHomeAsUpEnabled(true);
     }
 
     private void initViews() {
@@ -113,9 +138,30 @@ public class EditActivity extends AppCompatActivity {
         editview = (EditText) findViewById(R.id.note_edit);
         mUpdateTime = (TextView) findViewById(R.id.update_time);
         alarm= (TextView) findViewById(R.id.alarm);
+        images = (TextView) findViewById(R.id.images);
+        images.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(images.getText().toString().equals("0"))
+                    return;
+                Intent intent = new Intent(EditActivity.this,PhotoActivity.class);
+                String name = null;
+                if(mCreate)
+                    name = "new";
+                else
+                    name = mNote_id+"";
+                intent.putExtra(PhotoActivity.NOTE_ID,
+                        name);
+                startActivity(intent);
+            }
+        });
+        showImagesNumber();
 
+        //若Note不是新建并且有设置提醒
         if(!mCreate && mNote.getAlarmTime()!=-1){
-            showAlarmText(DateUtil.format(mNote.getAlarmTime(),"MM/dd/HH:mm"));
+            showAlarmText(DateUtil.format(mNote.getAlarmTime(), "MM/dd/HH:mm"));
+            alarmTime = Calendar.getInstance();
+            alarmTime.setTimeInMillis(mNote.getAlarmTime());
         }
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -137,6 +183,24 @@ public class EditActivity extends AppCompatActivity {
             }
         }
     }
+
+    //显示图片数量
+    private void showImagesNumber() {
+        if(images.getCompoundDrawables()[0]==null)
+        images.setCompoundDrawables(
+                DrawableUtil.getDrawable(this,android.R.drawable.ic_menu_gallery,R.color.my_primary),
+                null,null,null);
+        if(mCreate)
+            images.setText("0");
+        else{
+            images.setText(getImagesNumber(mNote_id+"")+"");
+        }
+    }
+
+    private int getImagesNumber(String mNote_id) {
+        return FileUtil.listFilesNameStart(FileUtil.getImagesPath().getAbsolutePath(),mNote_id);
+    }
+
 
     private void showAlarmText(String time) {
 
@@ -174,6 +238,16 @@ public class EditActivity extends AppCompatActivity {
     //启动相机
     private void addPhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        String last = System.currentTimeMillis() + ".jpg";
+        String path= FileUtil.getImageByName(
+                mCreate ? "new-" + last : mNote_id + "-" + last);
+        Log.e("photo",path);
+//        try {
+//            new File(path).createNewFile();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(path)));
         startActivityForResult(intent, 0);
     }
 
@@ -228,10 +302,15 @@ public class EditActivity extends AppCompatActivity {
         return left;
     }
 
+    /**
+     * 设置闹钟
+     * @param mil :提示的时间戳
+     * @param noteId
+     */
     private void setAlert(long mil,long noteId){
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         PendingIntent pendingIntent =PendingIntent.getBroadcast(this,0,new Intent("action.alarm.note").setClass(this, NoteAlarmRecevier.class),0);
-        alarm.set(AlarmManager.RTC_WAKEUP,mil,pendingIntent);
+        alarm.set(AlarmManager.RTC_WAKEUP, mil, pendingIntent);
     }
 
     private void deleteNote(){
@@ -246,17 +325,7 @@ public class EditActivity extends AppCompatActivity {
     }
 
 
-    private void setupToolBar() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        if (mCreate)
-            toolbar.setTitle(R.string.add);
-        else
-            toolbar.setTitle(R.string.edit);
-        setSupportActionBar(toolbar);
-        ActionBar bar=getSupportActionBar();
-        bar.setHomeButtonEnabled(true);
-        bar.setDisplayHomeAsUpEnabled(true);
-    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -269,8 +338,11 @@ public class EditActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
+//        super.onActivityResult(requestCode, resultCode, data);
+        if(mCreate)
+            images.setText(getImagesNumber("new")+"");
+        else
+            images.setText(getImagesNumber(mNote_id+"")+"");
     }
 
     @Override
@@ -284,8 +356,10 @@ public class EditActivity extends AppCompatActivity {
         long newId=-1;
         Intent intent;
         //如果为新建模式且内容未空就不保存
-        if(mCreate && content.equals(""))
+        if(mCreate && content.equals("")){
+            FileUtil.delete(FileUtil.listFilesStart(FileUtil.getImagesPath().getAbsolutePath(),"new"));
             return;
+        }
 
         NotePreview note = new NotePreview();
 
@@ -299,6 +373,7 @@ public class EditActivity extends AppCompatActivity {
         if(mCreate){//新建
             note.setContent(content);
             newId = mDao.save(note);
+            renameFiles(FileUtil.listFilesStart(FileUtil.getImagesPath().getAbsolutePath(),"new"),newId+"");
             intent= makeIntent(MainActivity.ACTION_ADD, newId);
         }else{//更新操作
             note.setId(mNote_id);
@@ -314,6 +389,11 @@ public class EditActivity extends AppCompatActivity {
 
 //        Intent intent = makeIntent();
         setResult(0, intent);
+    }
+
+    //将"new-21312341.jpg"改名为"123-123124.jpg"
+    private void renameFiles(File[] files,String newName) {
+        FileUtil.replaceName(files,"new",newName);
     }
 
     //更行Note

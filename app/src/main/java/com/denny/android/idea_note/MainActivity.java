@@ -9,6 +9,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -101,9 +102,13 @@ public class MainActivity extends AppCompatActivity {
         mNavi.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
-                if (item.getItemId() == R.id.cloud){
-                    startActivity(new Intent(MainActivity.this, UploadActivity.class));
-                    return true;
+                switch (item.getItemId()){
+                    case R.id.cloud:
+                        startActivity(new Intent(MainActivity.this, UploadActivity.class));
+                        return true;
+                    case R.id.about:
+                        showAboutDialog();
+                        return true;
                 }
                 return false;
             }
@@ -219,15 +224,21 @@ public class MainActivity extends AppCompatActivity {
                     openDrawer();
                 }
                 break;
-            case R.id.cloud:
-//                test();
-
+            case R.id.about:
+                showAboutDialog();
                 break;
             default:
                 return false;
         }
 
         return true;
+    }
+
+    private void showAboutDialog() {
+        new AlertDialog.Builder(this).setMessage("组员：\r\n122012002 蔡东\r\n122012006 陈俊汝\r\n 122012045 黄嘉林")
+                .setTitle("关于本App")
+                .setPositiveButton("OK",null)
+                .show();
     }
 
     private void test() {

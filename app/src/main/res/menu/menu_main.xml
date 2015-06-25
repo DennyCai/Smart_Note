@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
-    <group android:checkableBehavior="all">
+    <group android:checkableBehavior="single" android:orderInCategory="100">
         <item android:id="@+id/my_note" android:title="@string/my_note"
         android:orderInCategory="100" app:showAsAction="never"
             android:checked="true"
@@ -16,5 +16,16 @@
             android:checkable="true"
             android:visible="false"
             />
+
     </group>
+
+    <item
+        android:orderInCategory="200"
+        tools:ignore="MenuTitle">
+        <menu>
+            <item android:title="关于"
+                android:id="@+id/about"/>
+        </menu>
+    </item>
+
 </menu>

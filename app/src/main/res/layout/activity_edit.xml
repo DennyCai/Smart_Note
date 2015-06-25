@@ -69,6 +69,15 @@
             android:drawablePadding="8dp"
             android:textColor="?attr/colorPrimary"/>
 
+        <TextView
+            android:id="@+id/images"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:drawablePadding="8dp"
+            android:clickable="true"
+            android:textColor="?attr/colorPrimary"/>
+
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
