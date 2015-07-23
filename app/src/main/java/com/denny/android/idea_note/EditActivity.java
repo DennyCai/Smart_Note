@@ -317,6 +317,7 @@ public class EditActivity extends AppCompatActivity {
         if(mDao.deleteById(mNote_id)){
             Intent data = makeIntent(MainActivity.ACTION_DELETE,mNote_id);
             setResult(0,data);
+
            this.supportFinishAfterTransition();
         }else{
             Snackbar.make(findViewById(R.id.rootview),"删除失败",Snackbar.LENGTH_SHORT)
