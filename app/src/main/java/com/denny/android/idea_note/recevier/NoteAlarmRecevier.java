@@ -20,20 +20,6 @@ public class NoteAlarmRecevier extends BroadcastReceiver {
         // TODO: This method is called when the BroadcastReceiver is receiving
         // an Intent broadcast.
         Log.e(NoteAlarmRecevier.class.getSimpleName(),intent.getAction());
-//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
-//                new Intent(context, MainActivity.class), 0);
-//        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-//        Notification notification = new Notification.Builder(context)
-//                .setAutoCancel(true)
-//                .setContentTitle("SmamrtNote")
-//                .setContentText("有一条提示信息")
-//                .setTicker("有一条提示信息")
-//                .setWhen(System.currentTimeMillis())
-////                .setSound(context.get)
-//                .setContentIntent(pendingIntent)
-//                .getNotification();
-//        manager.notify(1,notification);
-//        context.startActivity(new Intent(context,MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         notify(context);
     }
 
